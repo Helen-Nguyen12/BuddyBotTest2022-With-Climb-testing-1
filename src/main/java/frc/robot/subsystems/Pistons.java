@@ -6,25 +6,30 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot.subsystems;
+
+import frc.robot.RobotContainer;
 import frc.robot.Constants.PistonsConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.ctre.phoenix.motorcontrol.can.*;
+import com.revrobotics.CANSparkMax;
 
 public class Pistons extends SubsystemBase {
   /**
    * Creates a new Pistons.
    */
-  private final DoubleSolenoid upperPiston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, PistonsConstants.kUpperPistonExtendChannel, PistonsConstants.kUpperPistonRetractChannel);
-  private final DoubleSolenoid lowerPiston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM , PistonsConstants.kLowerPistonExtendChannel, PistonsConstants.kLowerPistonRetractChannel);
+  private final static DoubleSolenoid upperPiston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,
+      PistonsConstants.kUpperPistonExtendChannel, PistonsConstants.kUpperPistonRetractChannel);
+  private final static DoubleSolenoid lowerPiston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,
+      PistonsConstants.kLowerPistonExtendChannel, PistonsConstants.kLowerPistonRetractChannel);
 
   public Pistons() {
     retractUpper();
     retractLower();
-
-
   }
 
   public void extendUpper() {

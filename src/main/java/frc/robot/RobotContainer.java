@@ -7,25 +7,39 @@
 
 package frc.robot;
 
+import java.time.Instant;
+
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.PistonsConstants;
+import frc.robot.commands.ClimbPID;
+import frc.robot.commands.ClimbPID2;
+import frc.robot.commands.PistonExtend;
+import frc.robot.commands.PistonRetract;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-
 /**
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot
+ * (including subsystems, commands, and button mappings) should be declared
+ * here.
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  
   // subsystems
 
   private final Drive m_Drive = new Drive();
@@ -33,51 +47,74 @@ public class RobotContainer {
   private final Pistons m_Pistons = new Pistons();
   @SuppressWarnings("unused") // we never directly use this subsystem but it has code in periodic
   private final LimitSwitches m_limitSwitches = new LimitSwitches();
-  
-  // commands
+  private Command ClimbPID;
 
+  // commands
 
   // OI
   private final Joystick m_Gamepad = new Joystick(0);
- 
- 
 
   /**
-   * The container for the robot.  Contains subsystems, OI devices, and commands.
+   * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
- 
+
     // Configure the button bindings
     configureButtonBindings();
 
     // m_drive default command to drive arcade with the right joystick
     m_Drive.setDefaultCommand(
-      new RunCommand(()-> m_Drive.driveArcade
-        (m_Gamepad.getRawAxis(5) * -1, m_Gamepad.getRawAxis(4)), m_Drive));
-    
+        new RunCommand(() -> m_Drive.driveArcade(m_Gamepad.getRawAxis(5) * -1, m_Gamepad.getRawAxis(4)), m_Drive));
+
     // m_TestMotors default command left joystick X runs motor1 Y runs motor 2
-    m_TestMotors.setDefaultCommand(new RunCommand(() -> m_TestMotors.setMotors(m_Gamepad.getRawAxis(0), m_Gamepad.getRawAxis(1) * -1), m_TestMotors));
+    m_TestMotors.setDefaultCommand(new RunCommand(
+        () -> m_TestMotors.setMotors(m_Gamepad.getRawAxis(0), m_Gamepad.getRawAxis(1) * -1), m_TestMotors));
 
   }
 
   /**
-   * Use this method to define your button->command mappings.  Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
 
     // Extend upper piston when left bumper is down
     new JoystickButton(m_Gamepad, 3).whenPressed(new InstantCommand(m_Pistons::extendUpper, m_Pistons))
-                                    .whenReleased(new InstantCommand(m_Pistons::retractUpper, m_Pistons));
+        .whenReleased(new InstantCommand(m_Pistons::retractUpper, m_Pistons));
 
     // Extend lower piston when left bumper is down
     new JoystickButton(m_Gamepad, 2).whenPressed(new InstantCommand(m_Pistons::extendLower, m_Pistons))
-                                    .whenReleased(new InstantCommand(m_Pistons::retractLower, m_Pistons));                                    
+        .whenReleased(new InstantCommand(m_Pistons::retractLower, m_Pistons));
+
+    /*
+     * new JoystickButton(m_Gamepad, 1).whenPressed(new SequentialCommandGroup(
+     * new InstantCommand(m_Drive::motorDistanceTwo, m_Drive),
+     * new InstantCommand(m_Pistons::retractUpper, m_Pistons),
+     * new InstantCommand(m_Drive::motorDistanceThree, m_Drive),
+     * new InstantCommand(m_Pistons::extendUpper, m_Pistons)));
+     */
+    // new JoystickButton(m_Gamepad, 4).whenPressed(new ClimbPID(m_Drive,
+    // DriveConstants.climbDistance3));
+    new JoystickButton(m_Gamepad, 4).whenPressed(new ClimbPID2(m_Drive, DriveConstants.climbDistance3));
+    // new JoystickButton(m_Gamepad, 1).whenPressed(new PistonRetract(m_Pistons));
+    // new JoystickButton(m_Gamepad, 4).whenPressed(new PistonExtend(m_Pistons));
+    // new JoystickButton(m_Gamepad, 4).whenPressed(new
+    // InstantCommand(m_Pistons::extendUpper, m_Pistons));
+    // new JoystickButton(m_Gamepad, 1).whenPressed(new
+    // InstantCommand(m_Pistons::retractUpper, m_Pistons));
+
+    new JoystickButton(m_Gamepad, 1).whenPressed(new SequentialCommandGroup(
+        new ClimbPID(m_Drive, DriveConstants.climbDistance2),
+        new PistonExtend(m_Pistons),
+        new ClimbPID2(m_Drive, DriveConstants.climbDistance3),
+        new PistonRetract(m_Pistons)));
+    SmartDashboard.putData("Climb Run", new ClimbPID(m_Drive, 9)); // Puts data on Shuffleboard to use the command
 
   }
-
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -85,7 +122,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-     // An ExampleCommand will run in autonomous
-     return null;  
+    // An ExampleCommand will run in autonomous
+    return null;
   }
 }

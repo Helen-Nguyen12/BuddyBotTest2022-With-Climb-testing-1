@@ -25,6 +25,7 @@ import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -90,30 +91,14 @@ public class RobotContainer {
     new JoystickButton(m_Gamepad, 2).whenPressed(new InstantCommand(m_Pistons::extendLower, m_Pistons))
         .whenReleased(new InstantCommand(m_Pistons::retractLower, m_Pistons));
 
-    /*
-     * new JoystickButton(m_Gamepad, 1).whenPressed(new SequentialCommandGroup(
-     * new InstantCommand(m_Drive::motorDistanceTwo, m_Drive),
-     * new InstantCommand(m_Pistons::retractUpper, m_Pistons),
-     * new InstantCommand(m_Drive::motorDistanceThree, m_Drive),
-     * new InstantCommand(m_Pistons::extendUpper, m_Pistons)));
-     */
-    // new JoystickButton(m_Gamepad, 4).whenPressed(new ClimbPID(m_Drive,
-    // DriveConstants.climbDistance3));
-    new JoystickButton(m_Gamepad, 4).whenPressed(new ClimbPID2(m_Drive, DriveConstants.climbDistance3));
-    // new JoystickButton(m_Gamepad, 1).whenPressed(new PistonRetract(m_Pistons));
-    // new JoystickButton(m_Gamepad, 4).whenPressed(new PistonExtend(m_Pistons));
-    // new JoystickButton(m_Gamepad, 4).whenPressed(new
-    // InstantCommand(m_Pistons::extendUpper, m_Pistons));
-    // new JoystickButton(m_Gamepad, 1).whenPressed(new
-    // InstantCommand(m_Pistons::retractUpper, m_Pistons));
-
     new JoystickButton(m_Gamepad, 1).whenPressed(new SequentialCommandGroup(
         new ClimbPID(m_Drive, DriveConstants.climbDistance2),
-        new PistonExtend(m_Pistons),
+        new WaitCommand(2),
+        new InstantCommand(m_Pistons::extendUpper, m_Pistons),
+        new WaitCommand(2),
         new ClimbPID2(m_Drive, DriveConstants.climbDistance3),
-        new PistonRetract(m_Pistons)));
-    SmartDashboard.putData("Climb Run", new ClimbPID(m_Drive, 9)); // Puts data on Shuffleboard to use the command
-
+        new WaitCommand(2),
+        new InstantCommand(m_Pistons::retractUpper, m_Pistons)));
   }
 
   /**

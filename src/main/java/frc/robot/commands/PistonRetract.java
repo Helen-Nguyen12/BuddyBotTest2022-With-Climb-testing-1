@@ -23,5 +23,7 @@ public class PistonRetract extends InstantCommand {
   @Override
   public void initialize() {
     m_pistons.retractUpper();
+    System.out.println("PISTON RETRACT");
+
   }
 }

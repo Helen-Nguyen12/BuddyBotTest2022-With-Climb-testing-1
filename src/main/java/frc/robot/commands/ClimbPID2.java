@@ -36,7 +36,6 @@ public class ClimbPID2 extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_drive.zeroEncoders();
     m_drive.m_leftMotorPID.setP(DriveConstants.CLIMB_kP);
     m_drive.m_leftMotorPID.setI(DriveConstants.CLIMB_kI);
     m_drive.m_leftMotorPID.setD(DriveConstants.CLIMB_kD);
@@ -48,13 +47,15 @@ public class ClimbPID2 extends CommandBase {
     m_drive.m_rightMotorPID.setOutputRange(DriveConstants.CLIMB_MIN_OUTPUT, DriveConstants.CLIMB_MAX_OUTPUT);
     leftGoal = m_drive.inchesToRevs(inch_goal);
     rightGoal = m_drive.inchesToRevs(inch_goal);
+    // m_drive.motorDistanceThree(leftGoal, rightGoal);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     m_drive.motorDistanceThree(leftGoal, rightGoal);
-    SmartDashboard.putNumber("Goal to travel to", leftGoal);
+    SmartDashboard.putNumber("Goal to travel to", rightGoal);
   }
 
   // Called once the command ends or is interrupted.
@@ -66,18 +67,23 @@ public class ClimbPID2 extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    /*
-     * if ((m_drive.getLeftRevs() > leftGoal + stop_threshold_revs)
-     * && (m_drive.getLeftRevs() < leftGoal - stop_threshold_revs) &&
-     * m_drive.getRightRevs() > rightGoal - stop_threshold_revs
-     * && (m_drive.getRightRevs() < rightGoal + stop_threshold_revs)) {
-     * onTargetCount++;
-     * } else {
-     * onTargetCount = 0;
-     * }
-     * 
-     * return onTargetCount > count_threshold;
-     */
-    return false;
+    // if ((m_drive.getLeftRevs() > leftGoal + stop_threshold_revs)
+    // && (m_drive.getLeftRevs() < leftGoal - stop_threshold_revs) &&
+    // m_drive.getRightRevs() > rightGoal - stop_threshold_revs
+    // && (m_drive.getRightRevs() < rightGoal + stop_threshold_revs)) {
+    // onTargetCount++;
+    // } else {
+    // onTargetCount = 0;
+    // }
+
+    // return onTargetCount > count_threshold;
+    if (m_drive.getAverageEncoderDistance() >= 23) {
+      System.out.println("CLIMBPID 2 END");
+
+      return true;
+    } else {
+      return false;
+    }
+    // return false;
   }
 }

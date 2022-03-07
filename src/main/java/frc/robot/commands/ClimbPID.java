@@ -48,6 +48,9 @@ public class ClimbPID extends CommandBase {
     m_drive.m_rightMotorPID.setOutputRange(DriveConstants.CLIMB_MIN_OUTPUT, DriveConstants.CLIMB_MAX_OUTPUT);
     leftGoal = m_drive.inchesToRevs(inch_goal);
     rightGoal = m_drive.inchesToRevs(inch_goal);
+    // m_drive.motorDistanceTwo(leftGoal, rightGoal);
+    System.out.println("CLIMB PID INIT");
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -67,19 +70,24 @@ public class ClimbPID extends CommandBase {
   @Override
   public boolean isFinished() {
 
-    if ((m_drive.getLeftRevs() > leftGoal + stop_threshold_revs)
-        && (m_drive.getLeftRevs() < leftGoal - stop_threshold_revs) &&
-        m_drive.getRightRevs() > rightGoal - stop_threshold_revs
-        && (m_drive.getRightRevs() < rightGoal + stop_threshold_revs)) {
-      onTargetCount++;
-      return true;
-    } else {
-      onTargetCount = 0;
-      return false;
-    }
-
+    // if ((m_drive.getLeftRevs() > leftGoal + stop_threshold_revs)
+    // && (m_drive.getLeftRevs() < leftGoal - stop_threshold_revs) &&
+    // (m_drive.getRightRevs() > rightGoal - stop_threshold_revs)
+    // && (m_drive.getRightRevs() < rightGoal + stop_threshold_revs)) {
+    // onTargetCount++;
+    // // return true;
+    // } else {
+    // onTargetCount = 0;
+    // return false;
+    // }
     // return onTargetCount > count_threshold;
 
-    // return false;
+    if (m_drive.getLeftRevs() >= 9 && m_drive.getRightRevs() >= 9) {
+      System.out.println("CLIMBPID END");
+
+      return true;
+    } else {
+      return false;
+    }
   }
 }
